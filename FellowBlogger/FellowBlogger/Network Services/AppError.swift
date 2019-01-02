@@ -2,7 +2,7 @@
 //  AppError.swift
 //  NetworkStack
 //
-//  Created by Alex Paul on 12/29/18.
+//  Created by Alex Paul on 01/02/18.
 //  Copyright © 2018 Alex Paul. All rights reserved.
 //
 import Foundation
@@ -20,7 +20,7 @@ public enum AppError: Error {
     case .badURL(let message):
       return "badURL: \(message)"
     case .networkError(let error):
-      return "networkError: \(error)"
+      return error.localizedDescription
     case .noResponse:
       return "no network response"
     case .decodingError(let error):

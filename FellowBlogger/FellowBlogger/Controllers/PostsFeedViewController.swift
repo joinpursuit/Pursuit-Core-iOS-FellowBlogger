@@ -12,25 +12,57 @@ class PostsFeedViewController: UIViewController {
   
   @IBOutlet weak var tableView: UITableView!
   
-  // TODO: declare refresh control
+  private var refreshControl: UIRefreshControl!
   
-  private var posts = [Post]()
+  private var posts = [Post]() {
+    didSet {
+      DispatchQueue.main.async {
+        self.title = "FellowBlogger (\(self.posts.count))"
+        self.tableView.reloadData()
+      }
+    }
+  }
 
   override func viewDidLoad() {
     super.viewDidLoad()
     tableView.dataSource = self
+    setupRefreshControl()
+  }
+  
+  private func setupRefreshControl() {
+    refreshControl = UIRefreshControl()
+    tableView.refreshControl = refreshControl
+    refreshControl.addTarget(self, action: #selector(fetchPosts), for: .valueChanged)
   }
   
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(true)
     // we need to fetch new posts to reflect our newly published post
     // this will be handled through the delegation pattern coming up in Unit 4
+    fetchPosts()
   }
   
-  // TODO: write function to setup refresh control
+  private func showAlert(title: String, message: String) {
+    let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+    let okAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
+    alertController.addAction(okAction)
+    present(alertController, animated: true, completion: nil)
+  }
   
-  private func fetchPosts() {
-    // TODO: implement 
+  @objc private func fetchPosts() {
+    refreshControl.beginRefreshing()
+    BlogAPIClient.getPosts { (appError, posts) in
+      if let appError = appError {
+        DispatchQueue.main.async {
+          self.showAlert(title: "Error Message", message: appError.errorMessage())
+        }
+      } else if let posts = posts {
+        self.posts = posts
+      }
+      DispatchQueue.main.async {
+        self.refreshControl.endRefreshing()
+      }
+    }
   }
   
   override func prepare(for segue: UIStoryboardSegue, sender: Any?) {

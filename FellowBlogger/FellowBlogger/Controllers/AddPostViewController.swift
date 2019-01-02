@@ -31,25 +31,57 @@ class AddPostViewController: UIViewController {
     descriptionTextView.textColor = .lightGray
   }
   
-  // TODO: implement cancel button if user wants to dismiss publishing
   @IBAction func cancelButtonPressed(_ sender: UIBarButtonItem) {
-    
+    dismiss(animated: true, completion: nil)
   }
   
-  // TODO: show alert controller to update user of publish post state
-  private func showAlert() {
-    
+  private func showAlert(title: String, message: String) {
+    let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+    let okAction = UIAlertAction(title: "Ok", style: .default) { (alertAction) in
+      self.dismiss(animated: true, completion: nil)
+    }
+    alertController.addAction(okAction)
+    present(alertController, animated: true, completion: nil)
   }
   
-  // TODO: publish post button
   @IBAction func publishPost(_ sender: UIBarButtonItem) {
-    // TODO: get title and description for Post from text views
+    guard let titleText = titleTextView.text,
+      let descriptionText = descriptionTextView.text else {
+        return
+    }
+    publishButton.isEnabled = false
+    let date = Date() // current date
+    let isoDateFormatter = ISO8601DateFormatter()
+    isoDateFormatter.timeZone = TimeZone.current
+    isoDateFormatter.formatOptions = [.withFullDate,
+                                      .withInternetDateTime,
+                                      .withDashSeparatorInDate,
+                                      .withColonSeparatorInTime]
+    let timeStamp = isoDateFormatter.string(from: date)
     
-    // TODO: create a timestamp for Post
+    // initialize Post object to be sent to API
+    let post = Post.init(postId: "", author: "Alex Paul", title: titleText, description: descriptionText, createdAt: timeStamp)
     
-    // TODO: initialize a Post object, leave postId blank, other requirements: author, title, description and createdAt properties
-    
-    // TODO: use JSONEncoder() to create Data object to upload to API
+    do {
+      let data = try JSONEncoder().encode(post)
+      BlogAPIClient.publishPost(data: data) { (success) in
+        if success {
+          DispatchQueue.main.async {
+            self.showAlert(title: "Published successfully", message: "")
+          }
+        } else {
+          DispatchQueue.main.async {
+            self.showAlert(title: "Error Publishing", message: "")
+          }
+        }
+        DispatchQueue.main.sync {
+          self.publishButton.isEnabled = true
+        }
+      }
+    } catch {
+      showAlert(title: "Error Publishing", message: "\(error)")
+      publishButton.isEnabled = true
+    }
   }
 }
 
