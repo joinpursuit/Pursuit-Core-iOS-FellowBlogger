@@ -60,7 +60,8 @@ class AddPostViewController: UIViewController {
     let timeStamp = isoDateFormatter.string(from: date)
     
     // initialize Post object to be sent to API
-    let post = Post.init(postId: "", author: "Alex Paul", title: titleText, description: descriptionText, createdAt: timeStamp)
+    #error ("author name required")
+    let post = Post.init(postId: "", author: "", title: titleText, description: descriptionText, createdAt: timeStamp)
     
     do {
       let data = try JSONEncoder().encode(post)
