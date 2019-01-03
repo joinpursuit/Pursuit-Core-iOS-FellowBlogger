@@ -15,13 +15,22 @@ struct Post: Codable {
   let description: String
   let createdAt: String
   
-  public var formattedDate: String {
+  public var formattedDateString: String {
     let isoDateFormatter = ISO8601DateFormatter()
     var createdDate = ""
     if let date = isoDateFormatter.date(from: createdAt) {
       let dateFormatter = DateFormatter()
       dateFormatter.dateFormat = "MMMM, dd, yyyy h:mm a"
       createdDate = dateFormatter.string(from: date)
+    }
+    return createdDate
+  }
+  
+  public var date: Date {
+    let isoDateFormatter = ISO8601DateFormatter()
+    var createdDate = Date()
+    if let date = isoDateFormatter.date(from: createdAt) {
+      createdDate = date
     }
     return createdDate
   }

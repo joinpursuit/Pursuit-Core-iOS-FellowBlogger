@@ -84,7 +84,7 @@ extension PostsFeedViewController: UITableViewDataSource {
     let cell = tableView.dequeueReusableCell(withIdentifier: "PostCell", for: indexPath)
     let post = posts[indexPath.row]
     cell.textLabel?.text = post.title
-    cell.detailTextLabel?.text = "\(post.author) (posted: \(post.formattedDate))"
+    cell.detailTextLabel?.text = "\(post.author) (posted: \(post.formattedDateString))"
     return cell
   }
 }

@@ -19,7 +19,7 @@ final class BlogAPIClient {
                                           } else if let data = data {
                                             do {
                                               var posts = try JSONDecoder().decode([Post].self, from: data)
-                                              posts = posts.sorted { $0.createdAt > $1.createdAt }
+                                              posts = posts.sorted { $0.date > $1.date }
                                               completionHandler(nil, posts)
                                             } catch {
                                               completionHandler(AppError.decodingError(error), nil)
